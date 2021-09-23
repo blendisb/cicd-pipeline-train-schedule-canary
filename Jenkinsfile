@@ -1,4 +1,4 @@
-pipeline {
+`pipeline {
     agent any
     environment {
         //be sure to replace "willbla" with your own Docker Hub username
@@ -36,6 +36,21 @@ pipeline {
                         app.push("latest")
                     }
                 }
+            }
+        }
+        stage('CanaryDeploy') {
+            when {
+                branch 'master'
+            }
+            environment {
+                CANARY_REPLICAS = 1
+            }
+            steps {
+                kubernetesDeploy(
+                kubeconfigId: 'kubeconfig',
+                configs: 'train-schdeule-kube-canary.yml',
+                enableConfigSubstitution: true
+                 )
             }
         }
         stage('DeployToProduction') {
